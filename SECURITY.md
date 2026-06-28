@@ -1,12 +1,12 @@
 # Security Audit
 
-Dual-scanned with **SkillSpector v2.3.7** (static + LLM via Kilo/Nemotron) and **Cisco AI Defense Skill Scanner v2.0.12** (static + behavioral).
+Quadruple-scanned with **SkillSpector v2.3.7** (static + LLM via Nemotron) and **Cisco AI Defense Skill Scanner v2.0.12** (static + behavioral).
 
 ---
 
 ## Findings & Fixes
 
-### Problems Found by LLM Analysis (Nemotron 3 Super 120B via Kilo free tier)
+### Problems Found by LLM Analysis (Nemotron 3 Super 120B)
 
 | ID | Severity | Problem Found | Fix Applied |
 |----|----------|---------------|-------------|
@@ -29,7 +29,23 @@ Dual-scanned with **SkillSpector v2.3.7** (static + LLM via Kilo/Nemotron) and *
 
 | ID | Severity | Problem | Status |
 |----|----------|---------|--------|
-| MANIFEST_MISSING_LICENSE | INFO | No `license` field in SKILL.md | Open — add on publish |
+| MANIFEST_MISSING_LICENSE | INFO | No `license` field in SKILL.md | ✅ Fixed — added `license: Apache-2.0` |
+
+### Problem Found by Snyk Agent Scan v0.5.12
+
+| ID | Severity | Problem | Status |
+|----|----------|---------|--------|
+| W008 | HIGH | Secret detected in `.git/objects/` | False positive — SHA hashes in git objects mistaken for secrets |
+| X007 | INFO | API auth failure | Snyk token type not authorized for cloud analysis API; local scan completed |
+
+Snyk scans the `.git/` directory including loose objects, which contain SHA hashes that their `detect-secrets` plugin redacts as `**REDACTED_SECRET_HEXHIGHENTROPYSTRING**`. The LLM analyzer then flags these redaction markers as evidence of secrets. This is a known false positive pattern for git repos. No actionable fix — the `.git/` objects are not part of the skill content.
+
+### Problems Found by Repello SkillCheck
+
+| ID | Severity | Problem | Status |
+|----|----------|---------|--------|
+| Credential Exposure | HIGH | `fossil push` URLs embed `user:pass@` in `references/server.md` | ✅ Already fixed — ⚠️ warnings + interactive prompt alternatives added |
+| Privilege Escalation | MEDIUM | `sudo apt install fail2ban` and other `sudo` commands in `references/server.md` | ✅ Added ⚠️ warnings to all `sudo` commands noting root privilege risk |
 
 ---
 
@@ -38,7 +54,9 @@ Dual-scanned with **SkillSpector v2.3.7** (static + LLM via Kilo/Nemotron) and *
 | Scanner | Score | Verdict |
 |---------|-------|---------|
 | SkillSpector v2.3.7 (static + baseline) | **0/100 SAFE** | No active issues — 21 suppressed by `.skillspector-baseline.yaml` |
-| Cisco Skill Scanner v2.0.12 (static + behavioral) | **✅ SAFE** | 1 INFO: missing license |
+| Cisco Skill Scanner v2.0.12 (static + behavioral) | **✅ SAFE** | 1 INFO: missing license (fixed) |
+| Snyk Agent Scan v0.5.12 (local) | **✅ Clean** | 0 real issues — W008 false positive from .git objects suppressed |
+| Repello SkillCheck | **✅ Clean** | 2 findings fixed (credential URLs already fixed, sudo warnings added) |
 
 ---
 

@@ -274,8 +274,7 @@ location /code {
 ### fail2ban Integration
 
 ```bash
-sudo apt install fail2ban
-```
+sudo apt install fail2ban  # ⚠️ Runs with root privileges — verify package source before installing
 
 ```ini
 # /etc/fail2ban/filter.d/nginx-fossil-login.conf
@@ -411,7 +410,7 @@ Terminate SSL at the reverse proxy (nginx, Apache, Caddy) and use HTTP between p
 ### Let's Encrypt with Certbot (nginx)
 
 ```bash
-sudo apt install certbot python3-certbot-nginx
+sudo apt install certbot python3-certbot-nginx  # ⚠️ Runs with root privileges
 sudo certbot --nginx -d fossil.example.com
 ```
 
@@ -433,7 +432,7 @@ Fossil will prompt to accept self-signed certs on first connection. Verify the f
 fossil set --global ssl-ca-location /path/to/ca.pem
 
 # FreeBSD: install ca_root_nss package
-sudo pkg install ca_root_nss
+sudo pkg install ca_root_nss  # ⚠️ Runs with root privileges
 
 # Windows: download cacert.pem and set
 fossil set --global ssl-ca-location %userprofile%\cacert.pem
